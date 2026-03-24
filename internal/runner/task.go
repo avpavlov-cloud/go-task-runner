@@ -27,7 +27,14 @@ func (s *SimpleTask) Execute(ctx context.Context) error {
 	}()
 
 	fmt.Printf("[Task %s] Начинаю выполнение...\n", s.ID)
-	time.Sleep(500 * time.Millisecond) // Имитация работы
+
+	// Вместо сна — крутим цикл 100 миллионов раз
+	sum := 0
+	for i := 0; i < 100_000_000; i++ {
+		sum += i
+	}
+	_ = sum
+
 	if s.ID == "3" {
 		panic("Вызов паники!")
 	}

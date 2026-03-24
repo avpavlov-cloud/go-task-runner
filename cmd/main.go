@@ -27,16 +27,24 @@ func main() {
 	// Запускаем 3 воркера
 	sched.Start(ctx, 3)
 
-	// Накидываем 5 задач
-	for i := 1; i <= 1000; i++ {
-		// Берем объект из пула (утверждаем тип через .(type))
-		task := runner.TaskPool.Get().(*runner.SimpleTask)
+	// 2. Имитируем постоянный поток задач
+	go func() {
+		for i := 1; ; i++ {
+			select {
+			case <-ctx.Done(): // Перестаем слать задачи, если нажали Ctrl+C
+				fmt.Println("[Main] Генерация задач остановлена.")
+				return
+			default:
+				t := runner.TaskPool.Get().(*runner.SimpleTask)
+				t.ID = fmt.Sprintf("%d", i)
+				sched.Submit(t)
+				time.Sleep(200 * time.Millisecond) // Чтобы не завалить консоль
+			}
+		}
+	}()
 
-		// 2. Инициализируем новыми данными
-		task.ID = fmt.Sprintf("%d", i)
-
-		sched.Submit(task)
-	}
+	// Главная горутина блокируется здесь до сигнала
+	<-ctx.Done()
 
 	sched.Wait()
 	c, p := sched.GetStats()
