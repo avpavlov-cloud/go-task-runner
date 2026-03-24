@@ -4,10 +4,14 @@ import (
 	"context"
 	"fmt"
 	"taskrunner/internal/runner"
+	"time"
 )
 
 func main() {
-	ctx := context.Background()
+	// Контекст закроется сам через 3 секунды
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
 	sched := runner.NewScheduler(10)
 
 	// Запускаем 3 воркера
@@ -19,5 +23,6 @@ func main() {
 	}
 
 	sched.Wait()
-	fmt.Println("Все задачи выполнены!")
+	c, p := sched.GetStats()
+	fmt.Printf("Итог: Выполнено: %d, Паник: %d\n", c, p)
 }
