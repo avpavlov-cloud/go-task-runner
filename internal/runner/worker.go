@@ -40,6 +40,15 @@ func (s *Scheduler) Start(ctx context.Context, workerCount int) {
 						return
 					} // Канал закрыт
 					func() {
+						// Сначала определяем возврат в пул через defer
+						// Он сработает ПОСЛЕ recover, когда выполнение функции завершится
+						defer func() {
+							if st, ok := task.(*SimpleTask); ok {
+								// Очищаем данные перед возвратом (важно!)
+								st.ID = ""
+								TaskPool.Put(st)
+							}
+						}()
 						defer func() {
 							if r := recover(); r != nil {
 								atomic.AddUint64(&s.panics, 1) // Атомарно +1

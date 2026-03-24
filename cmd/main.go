@@ -19,6 +19,12 @@ func main() {
 
 	// Накидываем 5 задач
 	for i := 1; i <= 5; i++ {
+		// Берем объект из пула (утверждаем тип через .(type))
+		task := runner.TaskPool.Get().(*runner.SimpleTask)
+
+		// 2. Инициализируем новыми данными
+		task.ID = fmt.Sprintf("%d", i)
+		
 		sched.Submit(&runner.SimpleTask{ID: fmt.Sprintf("%d", i)})
 	}
 

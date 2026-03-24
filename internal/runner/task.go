@@ -3,6 +3,7 @@ package runner
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -43,4 +44,11 @@ func (s *SimpleTask) Execute(ctx context.Context) error {
 
 func (s *SimpleTask) GetID() string {
 	return s.ID
+}
+
+// TaskPool — глобальный пул для SimpleTask
+var TaskPool = sync.Pool{
+	New: func() interface{} {
+		return &SimpleTask{} // Создаем новый объект, если пул пуст
+	},
 }
