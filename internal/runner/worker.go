@@ -2,6 +2,7 @@ package runner
 
 import (
 	"context"
+	"fmt"
 	"sync"
 )
 
@@ -27,8 +28,17 @@ func (s *Scheduler) Start(ctx context.Context, workerCount int) {
 				case <-ctx.Done(): // Остановка по контексту
 					return
 				case task, ok := <-s.tasksCh:
-					if !ok { return } // Канал закрыт
-					_ = task.Execute(ctx)
+					if !ok {
+						return
+					} // Канал закрыт
+					func() {
+						defer func() {
+							if r := recover(); r != nil {
+								fmt.Printf("[Worker %d] ПАНИКА поймана: %v\n", workerID, r)
+							}
+						}()
+						_ = task.Execute(ctx)
+					}()
 				}
 			}
 		}(i)

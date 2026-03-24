@@ -19,6 +19,9 @@ type SimpleTask struct {
 func (s *SimpleTask) Execute(ctx context.Context) error {
 	fmt.Printf("[Task %s] Начинаю выполнение...\n", s.ID)
 	time.Sleep(500 * time.Millisecond) // Имитация работы
+	if s.ID == "3" {
+		panic("Вызов паники!")
+	}
 	fmt.Printf("[Task %s] Завершено.\n", s.ID)
 	return nil
 }
