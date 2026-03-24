@@ -9,6 +9,7 @@ import (
 // Task — интерфейс для любой задачи в системе
 type Task interface {
 	Execute(ctx context.Context) error
+	GetID() string
 }
 
 // SimpleTask — простая реализация задачи для теста
@@ -24,4 +25,8 @@ func (s *SimpleTask) Execute(ctx context.Context) error {
 	}
 	fmt.Printf("[Task %s] Завершено.\n", s.ID)
 	return nil
+}
+
+func (s *SimpleTask) GetID() string {
+	return s.ID
 }
